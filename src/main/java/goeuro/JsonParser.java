@@ -4,6 +4,7 @@ import goeuro.parsing.CsvSuggestion;
 import goeuro.parsing.JsonRootObject;
 import goeuro.parsing.JsonSuggestion;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -21,28 +22,45 @@ public class JsonParser {
 
 	private static ObjectMapper objectMapper = new ObjectMapper();
 	private static CsvMapper csvMapper = new CsvMapper();
-	
-	public static void main(String[] args) throws InvalidArgumentsException, JsonParseException, JsonMappingException, IOException {
 
-		//TODO Remove line !
-		args = new String[]{"paris"};
+	public static void main(String[] args) throws InvalidArgumentsException, JsonParseException, JsonMappingException, IOException {
 
 		if (args.length < 1){
 			throw new InvalidArgumentsException("No query string specified. Please specify a query string in you run command line. ex : 'java -jar GoEuroTest.jar \"Berlin\"'");
 		}
 
-		//Check string query argument
+		//Checks string query argument and makes it URL-safe.
 		String query = args[0];
-
-		//		//Make it URL-safe
 		query = URLEncoder.encode(query, "UTF-8");
-
+		
+		//Fetches suggestions querying the API.
 		ArrayList<JsonSuggestion> jsonSuggestions = getSuggestions(query);
-
+		
+		if (jsonSuggestions.isEmpty()) {
+			System.out.println("No suggestions found !");
+			return;
+		}
+		
+		//Converts them into csv object mapping format.
 		ArrayList<CsvSuggestion> csvSuggestions = convertToCsvSuggestions(jsonSuggestions);
 		
-		buildCSV(csvSuggestions);
+		//Builds csv file.
+		String fileName = "output-"+query+".csv";
+		buildCSV(csvSuggestions, fileName);
+		
+		//Print a preview
+		System.out.println();
+		System.out.println("Here are the first results... The entire list is in file : "+fileName);
+		System.out.println();
+		printCSVPreview(csvSuggestions, 5);
 
+	}
+
+	private static void printCSVPreview(ArrayList<CsvSuggestion> csvSuggestions, int numOfLines) throws JsonProcessingException {
+		CsvSchema schema = csvMapper.schemaFor(CsvSuggestion.class).withUseHeader(true);
+		int nDisp = Math.min(csvSuggestions.size(), numOfLines);
+		System.out.println(csvMapper.writer(schema).writeValueAsString(csvSuggestions.subList(0, nDisp)));
+		System.out.println("Displaying "+nDisp+" out of "+csvSuggestions.size()+" results.");
 	}
 
 	private static ArrayList<CsvSuggestion> convertToCsvSuggestions(Collection<JsonSuggestion> jsonSuggestions) {
@@ -53,13 +71,9 @@ public class JsonParser {
 		return csvSuggestions;
 	}
 
-	private static void buildCSV(ArrayList<CsvSuggestion> suggestions) throws JsonProcessingException {
-		System.out.println(suggestions);
-		
-		// Schema from POJO (usually has @JsonPropertyOrder annotation)
+	private static void buildCSV(ArrayList<CsvSuggestion> suggestions, String fileName) throws IOException {
 		CsvSchema schema = csvMapper.schemaFor(CsvSuggestion.class).withUseHeader(true);
-		String out = csvMapper.writer(schema).writeValueAsString(suggestions);
-		System.out.println(out);
+		csvMapper.writer(schema).writeValue(new File(fileName), suggestions);
 	}
 
 	/**
