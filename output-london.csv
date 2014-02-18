@@ -1,0 +1,9 @@
+_type,_id,name,type,latitude,longitude
+Position,380553,"London, United Kingdom",location,51.50853,-0.12574
+Position,441278,"Londonderry, United Kingdom",location,54.9981,-7.30934
+Position,442345,"Acton, London, United Kingdom",location,51.50901,-0.2762
+Position,441793,"Ealing, London, United Kingdom",location,51.51216,-0.30204
+Position,315090,"London Gatwick (LGW), United Kingdom",airport,51.160465240478516,-0.17620690166950226
+Position,315110,"London Heathrow (LHR), United Kingdom",airport,51.4708554,-0.452638
+Position,315117,"London Stansted (STN), United Kingdom",airport,51.889339447021484,0.26246270537376404
+Position,315111,"London Luton (LTN), United Kingdom",airport,51.879379,-0.376292
