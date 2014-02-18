@@ -1,6 +1,9 @@
 package goeuro;
 
 import static org.junit.Assert.*;
+import goeuro.parsing.JsonSuggestion;
+import goeuro.parsing.Suggestion;
+import goeuro.parsing.JsonRootObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +20,12 @@ public class JsonParserTest {
 	public void test() {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			ResultsObject o = mapper.readValue(new File("resources/element1.json"), ResultsObject.class);
+			JsonRootObject o = mapper.readValue(new File("resources/element1.json"), JsonRootObject.class);
 
 			assertEquals(2, o.results.size());
 			
 			//Checks element 0
-			Element el = o.results.get(0);
+			JsonSuggestion el = o.results.get(0);
 			assertEquals("Position", el._type);
 			assertEquals(410978, el._id);
 			assertEquals("Potsdam, USA", el.name);
